@@ -14,32 +14,78 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-use iced::{Element, Sandbox, Settings, Text};
+use iced::{button, Button, Column, Element, Row, Sandbox, Settings, Text, text_input, TextInput};
 
 mod gradescope;
 
-struct GSGui;
+#[derive(Debug, Clone)]
+enum GSMessage {
+    RetrieveResults,
+    PathChanged(String)
+}
+
+#[derive(Default)]
+struct GSGui {
+    // The result pulled from 
+    grader_result: Option<gradescope::GraderResult>,
+    // Where to grab the results
+    retrieve_path: String,
+
+    // The state of the GUI
+    retrieve_button: button::State,
+    retrieve_path_state: text_input::State
+}
 
 impl Sandbox for GSGui {
-    type Message = ();
+    type Message = GSMessage;
 
-    fn new() -> GSGui {
-        GSGui
+    fn new() -> Self {
+        Self::default()
     }
 
     fn title(&self) -> String {
         String::from("Gradescope Local")
     }
 
-    fn update(&mut self, _message: Self::Message) {
-        // Boilerplate, no updates currently
+    fn update(&mut self, message: Self::Message) {
+        match message {
+            Self::Message::RetrieveResults => {
+                println!("{}", self.retrieve_path)
+            }
+            Self::Message::PathChanged(path) => {
+                self.retrieve_path = path;
+            }
+        }
     }
 
     fn view(&mut self) -> Element<Self::Message> {
-        Text::new("Gradescope Local is under Construction!").into()
+        Column::new()
+        .push(
+            Text::new("Gradescope Local is under Construction!")
+        )
+        .push(
+            Row::new()
+            .push(
+                TextInput::new(
+                    &mut self.retrieve_path_state,
+                    "Enterr the path to Gradescope's output",
+                    &self.retrieve_path,
+                    Self::Message::PathChanged
+                )
+                .on_submit(Self::Message::RetrieveResults)
+            )
+            .push(
+                Button::new(
+                    &mut self.retrieve_button,
+                    Text::new("Retrieve Result")
+                )
+                .on_press(Self::Message::RetrieveResults)
+            )
+        )
+        .into()
     }
 }
 
-fn main() {
-    GSGui::run(Settings::default());
-} 
+fn main() -> std::result::Result<(), iced::Error> {
+    GSGui::run(Settings::default())
+}

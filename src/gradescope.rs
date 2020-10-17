@@ -19,7 +19,7 @@ use serde::Deserialize;
 use serde_json::Value;
 
 #[derive(Deserialize, Debug)]
-struct TestResult {
+pub struct TestResult {
     score: Option<f32>,
     max_score: Option<f32>,
     number: Option<String>,
@@ -39,7 +39,7 @@ enum Visibility {
 }
 
 #[derive(Deserialize, Debug)]
-struct GraderResult {
+pub struct GraderResult {
     score: Option<f32>,
     execution_time: Option<u32>,
     output: Option<String>,
