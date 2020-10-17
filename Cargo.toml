@@ -1,0 +1,14 @@
+[package]
+name = "gradescope_local"
+description = "A tool to visualize and locally run gradescope."
+license = "Apache-2.0"
+version = "0.1.0"
+authors = ["Claire Moore <kurennon@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+iced = "0.1"
