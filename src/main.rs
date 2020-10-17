@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+use std::fs;
 use iced::{button, Button, Column, Element, Row, Sandbox, Settings, Text, text_input, TextInput};
 
 mod gradescope;
@@ -50,7 +51,14 @@ impl Sandbox for GSGui {
     fn update(&mut self, message: Self::Message) {
         match message {
             Self::Message::RetrieveResults => {
-                println!("{}", self.retrieve_path)
+                self.grader_result = match fs::read(&self.retrieve_path) {
+                    Ok(vec) => {
+                        serde_json::from_slice(vec.as_slice()).ok()
+                    }
+                    Err(_) => {
+                        None
+                    }
+                }
             }
             Self::Message::PathChanged(path) => {
                 self.retrieve_path = path;
@@ -59,6 +67,10 @@ impl Sandbox for GSGui {
     }
 
     fn view(&mut self) -> Element<Self::Message> {
+        let results_text = self.grader_result
+            .as_ref()
+            .map(|r| serde_json::to_string_pretty(r).unwrap_or(String::from("Failed to output results")))
+            .unwrap_or(String::from("No Results Loaded"));
         Column::new()
         .push(
             Text::new("Gradescope Local is under Construction!")
@@ -68,7 +80,7 @@ impl Sandbox for GSGui {
             .push(
                 TextInput::new(
                     &mut self.retrieve_path_state,
-                    "Enterr the path to Gradescope's output",
+                    "Enter the path to Gradescope's output",
                     &self.retrieve_path,
                     Self::Message::PathChanged
                 )
@@ -81,6 +93,9 @@ impl Sandbox for GSGui {
                 )
                 .on_press(Self::Message::RetrieveResults)
             )
+        )
+        .push(
+            Text::new(&results_text)
         )
         .into()
     }

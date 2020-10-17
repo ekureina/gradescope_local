@@ -15,10 +15,10 @@
  * limitations under the License.
 */
 
-use serde::Deserialize;
+use serde::{Serialize, Deserialize};
 use serde_json::Value;
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct TestResult {
     score: Option<f32>,
     max_score: Option<f32>,
@@ -29,7 +29,7 @@ pub struct TestResult {
     extra_data: Option<Value>
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "snake_case")]
 enum Visibility {
     Hidden,
@@ -38,7 +38,7 @@ enum Visibility {
     Visible
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GraderResult {
     score: Option<f32>,
     execution_time: Option<u32>,
