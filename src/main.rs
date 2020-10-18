@@ -15,7 +15,7 @@
  * limitations under the License.
 */
 use std::fs;
-use iced::{button, Button, Column, Element, Row, Sandbox, Settings, Text, text_input, TextInput};
+use iced::{button, Button, Column, Element, Row, Sandbox, scrollable, Scrollable, Settings, Text, text_input, TextInput};
 
 mod gradescope;
 
@@ -34,7 +34,8 @@ struct GSGui {
 
     // The state of the GUI
     retrieve_button: button::State,
-    retrieve_path_state: text_input::State
+    retrieve_path_state: text_input::State,
+    scrollable_state: scrollable::State,
 }
 
 impl Sandbox for GSGui {
@@ -67,10 +68,10 @@ impl Sandbox for GSGui {
     }
 
     fn view(&mut self) -> Element<Self::Message> {
-        let results_text = self.grader_result
+        let results_column: Column<'_, Self::Message> = self.grader_result
             .as_ref()
-            .map(|r| serde_json::to_string_pretty(r).unwrap_or(String::from("Failed to output results")))
-            .unwrap_or(String::from("No Results Loaded"));
+            .map(display_results)
+            .unwrap_or(Column::new().push(Text::new(String::from("No Results Loaded"))));
         Column::new()
         .push(
             Text::new("Gradescope Local is under Construction!")
@@ -95,10 +96,60 @@ impl Sandbox for GSGui {
             )
         )
         .push(
-            Text::new(&results_text)
+            Scrollable::new(&mut self.scrollable_state)
+            .push(
+                results_column
+            )
         )
         .into()
     }
+}
+
+fn display_results<'a>(result: &gradescope::GraderResult) -> Column<'a, GSMessage> {
+    let score = result.score
+        .unwrap_or_else(
+            || result.tests
+                .as_ref()
+                .unwrap()
+                .iter()
+                .fold(
+                    0.0,
+                    |full_score, test_score| full_score + test_score.score.unwrap()
+                )
+        );
+    let test_output = match result.tests.as_ref() {
+        Some(tests) => { 
+            tests.iter().fold(Column::new().padding(15), |column, test| {
+                let header = test.number.as_ref().unwrap().to_owned() + ") " + test.name.as_ref().unwrap_or(&String::from("")) + "(" +
+                    &test.score.as_ref().unwrap().to_string() + " / " + &test.max_score.as_ref().unwrap().to_string() + ")";
+                column
+                .push(
+                    Column::new()
+                    .push(
+                        Text::new(header)
+                    )
+                    .push(Text::new(test.output.as_ref().unwrap()))
+                )
+            })
+        }
+        None => {
+            Column::new()
+            .push(Text::new(String::from("No Tests")))
+        }
+    };
+    Column::new().padding(15)
+    .push(
+        Row::new()
+        .push(
+            Text::new(String::from("Score: "))
+        )
+        .push(
+            Text::new(score.to_string())
+        )
+    )
+    .push(
+        test_output
+    )
 }
 
 fn main() -> std::result::Result<(), iced::Error> {

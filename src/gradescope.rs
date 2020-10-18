@@ -20,18 +20,19 @@ use serde_json::Value;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct TestResult {
-    score: Option<f32>,
-    max_score: Option<f32>,
-    number: Option<String>,
-    output: Option<String>,
-    tags: Option<Vec<String>>,
-    visibility: Option<Visibility>,
-    extra_data: Option<Value>
+    pub score: Option<f32>,
+    pub max_score: Option<f32>,
+    pub name: Option<String>,
+    pub number: Option<String>,
+    pub output: Option<String>,
+    pub tags: Option<Vec<String>>,
+    pub visibility: Option<Visibility>,
+    pub extra_data: Option<Value>
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "snake_case")]
-enum Visibility {
+pub enum Visibility {
     Hidden,
     AfterPublished,
     AfterDueDate,
@@ -40,12 +41,12 @@ enum Visibility {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GraderResult {
-    score: Option<f32>,
-    execution_time: Option<u32>,
-    output: Option<String>,
-    visibility: Option<Visibility>,
-    stdout_visibility: Option<Visibility>,
-    extra_data: Option<Value>,
-    tests: Option<Vec<TestResult>>
+    pub score: Option<f32>,
+    pub execution_time: Option<u32>,
+    pub output: Option<String>,
+    pub visibility: Option<Visibility>,
+    pub stdout_visibility: Option<Visibility>,
+    pub extra_data: Option<Value>,
+    pub tests: Option<Vec<TestResult>>
     // No leaderboard Support
 }
