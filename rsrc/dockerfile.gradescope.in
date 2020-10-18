@@ -1,7 +1,8 @@
 FROM gradescope/auto-builds:latest
 RUN apt-get update && apt-get install -y curl unzip dos2unix && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 RUN mkdir -p /autograder/source
-ADD {source} /home/autograder.zip
+ADD {} /home/autograder.zip
+COPY {} /autograder/submission/
 RUN unzip -d /autograder/source /home/autograder.zip
 RUN cp /autograder/source/run_autograder /autograder/run_autograder
 RUN dos2unix /autograder/run_autograder /autograder/source/setup.sh

@@ -2,7 +2,7 @@
 name = "gradescope_local"
 description = "A tool to visualize and locally run gradescope."
 license = "Apache-2.0"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Claire Moore <kurennon@gmail.com>"]
 edition = "2018"
 

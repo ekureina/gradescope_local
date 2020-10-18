@@ -58,7 +58,7 @@ impl Visualizer {
         }
     }
 
-    fn view_result(result: &gradescope::GraderResult) -> Element<Message> {
+    pub fn view_result(result: &gradescope::GraderResult) -> Element<Message> {
         let score = result.score
             .unwrap_or_else(
                 || result.tests

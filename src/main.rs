@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-use iced::{button, Button, Column, Element, Row, Rule, Sandbox, Settings, Text};
+use iced::{button, Application, Button, Column, Command, Element, executor, Row, Rule, Settings, Text};
 
 mod docker;
 mod gradescope;
@@ -53,11 +53,13 @@ struct GSGui {
     docker_state: button::State
 }
 
-impl Sandbox for GSGui {
+impl Application for GSGui {
+    type Executor = executor::Default;
     type Message = Message;
+    type Flags = ();
 
-    fn new() -> Self {
-        Self::default()
+    fn new(_flags: Self::Flags) -> (Self, Command<Message>) {
+        (Self::default(), Command::none())
     }
 
     fn title(&self) -> String {
@@ -69,16 +71,18 @@ impl Sandbox for GSGui {
         String::from("Gradescope Local: ") + tab
     }
 
-    fn update(&mut self, message: Self::Message) {
+    fn update(&mut self, message: Self::Message) -> Command<Self::Message> {
         match message {
             Message::ResultMessage(result_message) => {
-                self.visualizer.update(result_message)
+                self.visualizer.update(result_message);
+                Command::none()
             }
             Message::DockerMessage(docker_message) => {
-                self.docker.update(docker_message)
+                self.docker.update(docker_message).map(Message::DockerMessage)
             }
             Message::ChangeState(new_state) => {
-                self.state = new_state
+                self.state = new_state;
+                Command::none()
             }
         }
     }
