@@ -16,19 +16,22 @@
 */
 use iced::{button, Button, Column, Element, Row, Rule, Sandbox, Settings, Text};
 
+mod docker;
 mod gradescope;
 mod results;
 
 #[derive(Debug, Clone)]
 enum Message {
     ChangeState(State),
-    ResultMessage(results::Message)
+    ResultMessage(results::Message),
+    DockerMessage(docker::Message)
 }
 
 #[derive(Debug, Clone, Copy)]
 enum State {
     Home,
-    Visualizer
+    Visualizer,
+    Docker
 }
 
 impl Default for State {
@@ -39,11 +42,15 @@ impl Default for State {
 
 #[derive(Default)]
 struct GSGui {
+    // Tab State and GUIs
     state: State,
     visualizer: results::Visualizer,
+    docker: docker::RunGradescope,
 
+    // Buttons to switch between states
     home_state: button::State,
-    visualizer_state: button::State
+    visualizer_state: button::State,
+    docker_state: button::State
 }
 
 impl Sandbox for GSGui {
@@ -56,7 +63,8 @@ impl Sandbox for GSGui {
     fn title(&self) -> String {
         let tab = match self.state {
             State::Home => "Home",
-            State::Visualizer => "Visualizer"
+            State::Visualizer => "Visualizer",
+            State::Docker => "Local Docker"
         };
         String::from("Gradescope Local: ") + tab
     }
@@ -65,6 +73,9 @@ impl Sandbox for GSGui {
         match message {
             Message::ResultMessage(result_message) => {
                 self.visualizer.update(result_message)
+            }
+            Message::DockerMessage(docker_message) => {
+                self.docker.update(docker_message)
             }
             Message::ChangeState(new_state) => {
                 self.state = new_state
@@ -81,6 +92,11 @@ impl Sandbox for GSGui {
                 self.visualizer
                     .view()
                     .map(Message::ResultMessage)
+            }
+            State::Docker => {
+                self.docker
+                    .view()
+                    .map(Message::DockerMessage)
             }
         };
 
@@ -101,6 +117,13 @@ impl Sandbox for GSGui {
                             Text::new(String::from("Visualizer"))
                         )
                         .on_press(Message::ChangeState(State::Visualizer))
+                    )   
+                    .push(
+                        Button::new(
+                            &mut self.docker_state,
+                            Text::new(String::from("Local Run"))
+                        )
+                        .on_press(Message::ChangeState(State::Docker))
                     )   
             )
             .push(Rule::horizontal(0))
