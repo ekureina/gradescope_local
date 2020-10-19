@@ -100,6 +100,7 @@ impl RunGradescope {
                     &self.submission_path,
                     Message::SubmissionPathChanged
                 )
+                .on_submit(Message::RunDocker)
             )
             .push(
                 Row::new()
@@ -110,6 +111,7 @@ impl RunGradescope {
                             &self.source_path,
                             Message::SourcePathChanged
                         )
+                        .on_submit(Message::RunDocker)
                     )
                     .push(
                         Button::new(
