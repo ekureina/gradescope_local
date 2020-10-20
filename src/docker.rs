@@ -127,10 +127,10 @@ impl RunGradescope {
 }
 
 async fn run_docker(source_path: String, submission_path: String) -> Option<Output> {
-    let source = Path::new(&source_path);
+    let source = Path::new(&source_path).canonicalize().unwrap();
     let docker_workspace = source.parent().unwrap();
     let source_zip = source.file_name().unwrap();
-    let submission = move_to_workspace(docker_workspace, Path::new(&submission_path));
+    let submission = move_to_workspace(docker_workspace, &Path::new(&submission_path).canonicalize().unwrap());
 
     run_docker_base(docker_workspace, source_zip.to_str().unwrap(), &submission)
 }

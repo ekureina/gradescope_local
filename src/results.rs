@@ -43,7 +43,7 @@ impl Visualizer {
     pub fn update(&mut self, message: Message) {
         match message {
             Message::RetrieveResults => {
-                self.grader_result = match fs::read(&self.retrieve_path) {
+                self.grader_result = match fs::read(fs::canonicalize(&self.retrieve_path).unwrap()) {
                     Ok(vec) => {
                         serde_json::from_slice(vec.as_slice()).ok()
                     }
